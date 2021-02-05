@@ -1,0 +1,19 @@
+---
+- name:
+  hosts: config_master
+  connection: httpapi
+  gather_facts: false
+  tasks:
+
+    - name: "Get dirs (groups) in cert/{{ inventory_hostname }}"
+      find:
+        paths: "./cert/{{ inventory_hostname }}"
+        recurse: no
+        file_type: directory
+      register: found_directories
+
+    - include_tasks: upload_group_certs.yml
+      with_items: "{{ found_directories.files }}"
+      vars:
+        cert_dir: "{{ item.path }}"
+      register: upload_cert_res

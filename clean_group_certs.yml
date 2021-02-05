@@ -1,0 +1,33 @@
+---
+
+- debug:
+    msg: "{{ cert_dir }}"
+
+- set_fact:
+    group_name: "{{ cert_dir | basename }}"
+
+- name: Cert in group
+  fadcos_certificate_in_group:
+    vdom: "{{ vdom }}"
+    state: absent
+    certificate_name: "{{ (item | basename | splitext)[0] }}"
+    group_name: "{{ group_name }}"
+    host:  "{{ host }}"
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
+  loop: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
+  register: upload_cert_res
+  failed_when: no
+
+- name: Upload cert
+  fadcos_certificate_local:
+    vdom: "{{ vdom }}"
+    state: absent
+    path: "{{ item | dirname }}"
+    name: "{{ (item | basename | splitext)[0] }}"
+    host:  "{{ host }}"
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
+  loop: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
+  register: upload_cert_res
+  failed_when: no
