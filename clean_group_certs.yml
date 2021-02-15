@@ -19,7 +19,7 @@
   register: upload_cert_res
   failed_when: no
 
-- name: Upload cert
+- name: Delete cert
   fadcos_certificate_local:
     vdom: "{{ vdom }}"
     state: absent

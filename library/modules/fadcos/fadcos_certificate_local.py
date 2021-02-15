@@ -6,6 +6,7 @@ import logging
 import difflib
 import re
 
+
 api = FortiADCAPI()
 
 def add_cert(data):
@@ -91,8 +92,8 @@ def param_check(module):
     state = module.params['state']
     err_msg = []
 
-    if (state == 'absent') and not module.params['mkey']:
-        err_msg.append('Parameter mkey must be set')
+    if (state == 'absent') and not module.params['name']:
+        err_msg.append('Parameter `name` must be set')
         res = False
 
     return res, err_msg
@@ -109,8 +110,7 @@ def main():
         "ssl_verify": {"required": False, "type": "bool", "default": "True"},
         "commands": {"required": False, "type": "str"},
         "name": {"required": False, "type": "str"},
-        "path": {"required": False, "type": "str"},
-        "mkey": {"required": False, "type": "str"}
+        "path": {"required": False, "type": "str"}
     }
 
     choice_map = {
@@ -134,6 +134,7 @@ def main():
     if not param_pass:
         result['err_msg'] = param_err
         result['failed'] = True
+        is_error = True
     else:
 
         is_error, has_changed, result = choice_map.get(module.params['state'])(module.params)

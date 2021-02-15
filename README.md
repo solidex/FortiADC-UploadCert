@@ -12,7 +12,7 @@ Ansible version: 2.8.11
 2/ Place certificates `*.cert` and corresponding keys `*.key` in a local directory
 
 
-  ```cert/<FortiADC inventory_hostname>/<local certifcate group name>/```
+```cert/<FortiADC inventory_hostname>/<local certifcate group name>/```
 
   Example:
 
