@@ -23,3 +23,19 @@
     - "{{ lookup('fileglob', cert_dir  +  '/*.crt', wantlist=True) }}"
   loop_control:
     loop_var: file
+
+- name: Replace '.' to '_' in cert
+  command: mv "{{ file }}" "{{ file | dirname }}/{{ (file | basename | splitext) [0] | replace('.','_') }}.cert"
+  with_items:
+    - "{{ lookup('fileglob', cert_dir  +  '/*.cert', wantlist=True) }}"
+  loop_control:
+    loop_var: file
+  when: "'.' in (file | basename | splitext)[0]"
+
+- name: Replace '.' to '_' in key
+  command: mv "{{ file }}" "{{ file | dirname }}/{{ (file | basename | splitext) [0] | replace('.','_') }}.key"
+  with_items:
+    - "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
+  loop_control:
+    loop_var: file
+  when: "'.' in (file | basename | splitext)[0]"
