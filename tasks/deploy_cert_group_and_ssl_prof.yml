@@ -1,0 +1,58 @@
+---
+
+- set_fact:
+    client_ssl_profile_name: "{{ cert_dir | basename }}"
+    group_name: "{{ cert_dir | basename }}"
+
+- debug:
+    msg: "Deploying client SSL profile {{ client_ssl_profile_name }}"
+
+- block:
+
+    - name: Add cert group
+      fadcos_local_certificate_group:
+        vdom: data
+        state: present
+        name: "{{ client_ssl_profile_name }}"
+        host:  "{{ host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+
+    - name: Add client ssl profile
+      fadcos_client_ssl_profile:
+        vdom: data
+        state: present
+        name: "{{ client_ssl_profile_name }}"
+        ssl-allowed_versions: "tlsv1.1 tlsv1.2"
+        local_certificate_group: "{{ client_ssl_profile_name }}"
+        host:  "{{ host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+
+    - name: Upload cert
+      fadcos_certificate_local:
+        vdom: "{{ vdom }}"
+        state: present
+        path: "{{ item | dirname }}"
+        name: "{{ (item | basename | splitext)[0] }}"
+        host:  "{{ host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+      loop: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
+      register: upload_cert_res
+      failed_when: "upload_cert_res['meta']['output']['payload'] | int  not in [0, -15]"
+
+    - name: Add cert to group
+      fadcos_certificate_in_group:
+        vdom: "{{ vdom }}"
+        state: present
+        certificate_name: "{{ (item | basename | splitext)[0] }}"
+        group_name: "{{ group_name }}"
+        host:  "{{ host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+      loop: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
+      register: upload_cert_res
+      failed_when: "upload_cert_res['meta']['output']['payload'] | int  not in [0, -15, -154]"
+
+  when: "lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) | length > 0"

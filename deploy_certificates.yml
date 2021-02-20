@@ -12,7 +12,7 @@
         file_type: directory
       register: found_directories
 
-    - include_tasks: upload_group_certs.yml
+    - include_tasks: tasks/deploy_cert_group_and_ssl_prof.yml
       with_items: "{{ found_directories.files }}"
       vars:
         cert_dir: "{{ item.path }}"
