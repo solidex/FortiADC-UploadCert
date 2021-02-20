@@ -27,7 +27,7 @@ def add_cert_to_group(data):
     for cert_obj in group_details:
         # check if cert in group
 
-        if cert_obj[u'local_cert'].encode('utf-8') == data['certificate_name']:
+        if cert_obj[u'local_cert'].encode('utf-8') == data['certificate_name'] or cert_obj['local_cert'] == data['certificate_name']:
             meta = {'http_status': 200 if status_code == 200 else 500, 'output': json.loads(output)}
             meta['status'] = json.loads(output)['payload']
             return False, False, meta
