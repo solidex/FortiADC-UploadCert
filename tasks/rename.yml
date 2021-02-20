@@ -1,0 +1,25 @@
+
+- debug:
+    msg:
+      - "{{ lookup('fileglob', cert_dir  +  '/*.crt', wantlist=True) }}"
+
+- name: Rename fullchain.pem to xxx.cert
+  command: mv "{{ file }}" "{{ file | dirname }}/{{ group_name }}.cert"
+  with_items:
+    - "{{ lookup('fileglob', cert_dir  +  '/fullchain.pem', wantlist=True) }}"
+  loop_control:
+    loop_var: file
+
+- name: Rename privkey.pem to xxx.key
+  command: mv "{{ cert_dir }}/privkey.pem" "{{ file | dirname }}/{{ group_name }}.key"
+  with_items:
+    - "{{ lookup('fileglob', cert_dir  +  '/privkey.pem', wantlist=True) }}"
+  loop_control:
+    loop_var: file
+
+- name: Rename .crt to .cert
+  command: mv "{{ file }}" "{{ file | dirname }}/{{ (file | basename | splitext) [0] }}.cert"
+  with_items:
+    - "{{ lookup('fileglob', cert_dir  +  '/*.crt', wantlist=True) }}"
+  loop_control:
+    loop_var: file

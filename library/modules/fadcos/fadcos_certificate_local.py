@@ -110,6 +110,8 @@ def main():
         "ssl_verify": {"required": False, "type": "bool", "default": "True"},
         "commands": {"required": False, "type": "str"},
         "name": {"required": False, "type": "str"},
+        "cert_filename": {"required": False, "type": "str"},
+        "key_filename": {"required": False, "type": "str"},
         "path": {"required": False, "type": "str"}
     }
 

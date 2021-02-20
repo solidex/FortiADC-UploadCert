@@ -3,6 +3,11 @@
   hosts: config_master
   connection: httpapi
   gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+
   tasks:
 
     - name: "Get dirs (groups) in cert/{{ inventory_hostname }}"
@@ -15,5 +20,7 @@
     - include_tasks: tasks/deploy_cert_group_and_ssl_prof.yml
       with_items: "{{ found_directories.files }}"
       vars:
-        cert_dir: "{{ item.path }}"
+        cert_dir: "{{ cert_groups_dir.path }}"
+      loop_control:
+        loop_var: cert_groups_dir
       register: upload_cert_res

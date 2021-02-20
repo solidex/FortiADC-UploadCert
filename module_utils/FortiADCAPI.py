@@ -147,7 +147,10 @@ class FortiADCAPI:
     def upload_cert(self, data):
         vdom = data['vdom']
         url = 'api/upload/certificate_local?entire=enable&vdom=%s' % vdom
+
         logger.debug("upload (post) %s" % url)
+        logger.debug(data['path'])
+        
         try:
             key_file = open(os.path.join(data['path'], data['name'] + '.key'), 'rb')
             cert_file = open(os.path.join(data['path'], data['name'] + '.cert'), 'rb')
