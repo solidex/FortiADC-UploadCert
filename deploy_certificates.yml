@@ -1,6 +1,6 @@
 ---
 - name:
-  hosts: config_master
+  hosts: config_master:&adc
   connection: httpapi
   gather_facts: false
 

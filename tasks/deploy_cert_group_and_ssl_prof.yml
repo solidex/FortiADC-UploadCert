@@ -44,8 +44,8 @@
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
       loop: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) }}"
-      register: upload_cert_res
-      failed_when: "upload_cert_res['meta']['output']['payload'] | int  not in [0, -15, -154]"
+      register: add_cert_res
+      failed_when: "add_cert_res['meta']['output']['payload'] | int  not in [0, -15, -154, -156]"
 
     - name: Add client ssl profile
       fadcos_client_ssl_profile:
@@ -58,4 +58,4 @@
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
 
-  when: "{{ lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) | length > 0 }}"
+  when: "lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) | length > 0"
