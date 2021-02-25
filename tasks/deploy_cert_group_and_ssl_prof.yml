@@ -58,4 +58,6 @@
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
 
-  when: "lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) | length > 0"
+  when:
+    - "lookup('fileglob', cert_dir  +  '/*.key', wantlist=True) | length > 0"
+    - "gnf | default(group_name) == group_name"
