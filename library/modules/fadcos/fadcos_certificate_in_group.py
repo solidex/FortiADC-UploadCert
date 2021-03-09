@@ -63,6 +63,7 @@ def delete_cert_from_group(data):
 
     if status_code == 200:
         group_details = json.loads(output)['payload']
+        logger.debug(group_details)
     else:
         meta = {'http_status': 200 if status_code == 200 else 500, 'output': json.loads(output)}
         meta['status'] = json.loads(output)['payload']
@@ -71,8 +72,9 @@ def delete_cert_from_group(data):
 
     mkey = -1
     for cert_obj in group_details:
+        logger.debug(cert_obj)
         # check if cert in group
-        if cert_obj[u'local_cert'].encode('utf-8') == data['certificate_name']:
+        if cert_obj['local_cert'] == data['certificate_name']:
             mkey = cert_obj['mkey']
             break
 

@@ -9,6 +9,42 @@ import re
 
 api = FortiADCAPI()
 
+def get_list(data):
+    api.login(data)
+
+    data['mkey'] = ''
+    status_code, output = api.get_obj('api/system_certificate_local', data)
+
+    changed = False
+    if status_code == 200:
+        # cert already exists, identified by name
+        if json.loads(output)['payload']:
+            meta = {"status": status_code, 'http_status': 200 if status_code == 200 else 500, 'output': json.loads(output)}
+        # cert doesn't exist, identified by name
+        else:
+            meta = {"status": status_code, 'http_status': 200 if status_code == 200 else 500, 'output': json.loads(output)}
+            if 'payload' in json.loads(output):
+                if json.loads(output)['payload'] == 0:
+                    changed = True
+                else:
+                    meta['status'] = json.loads(output)['payload']
+                    meta['err_msg'] = api.get_err_msg(meta['status'])
+    else:
+        meta = {"status": status_code, 'http_status': 200 if status_code == 200 else 500, 'output': json.loads(output)}
+        if 'payload' in json.loads(output):
+            meta['status'] = json.loads(output)['payload']
+            meta['err_msg'] = api.get_err_msg(meta['status'])
+
+    api.logout()
+
+    if meta['status'] in [0, 200]:
+        if changed:
+            return False, True, meta
+        else:
+            return False, False, meta
+    else:
+        return True, False, meta
+
 def add_cert(data):
     api.login(data)
 
@@ -117,7 +153,8 @@ def main():
 
     choice_map = {
         "present": add_cert,
-        "absent": delete_cert
+        "absent": delete_cert,
+        "get_list": get_list
     }
 
     module = AnsibleModule(argument_spec=fields,

@@ -1,0 +1,33 @@
+
+- name: "Get dirs (groups) in cert/{{ inventory_hostname }}"
+  find:
+    paths: "./cert/{{ inventory_hostname }}"
+    recurse: no
+    file_type: directory
+  register: found_directories
+
+
+- name: Release cert (delete from group)
+  fadcos_certificate_in_group:
+    vdom: "{{ vdom }}"
+    state: absent
+    certificate_name: "{{ cert_name }}"
+    group_name: "{{ group_name }}"
+    host:  "{{ host }}"
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
+  loop: "{{ found_directories.files }}"
+  loop_control:
+    loop_var: found_file
+  vars:
+    group_name: "{{ found_file.path | basename }}"
+  failed_when: no
+
+- name: Delete cert
+  fadcos_certificate_local:
+    vdom: "{{ vdom }}"
+    state: absent
+    name: "{{ cert_name }}"
+    host:  "{{ host }}"
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"

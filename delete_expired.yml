@@ -1,0 +1,38 @@
+---
+- name:
+  hosts: config_master:&adc
+  connection: httpapi
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    expired_cert_list: []
+
+
+  tasks:
+
+    - name: Get cert
+      fadcos_certificate_local:
+        state: get_list
+        vdom: "{{ vdom }}"
+        host:  "{{ host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+
+      register: cert_res
+
+    - set_fact:
+        expired_cert_list: "{{ expired_cert_list + [ item ] }}"
+      with_items: "{{ cert_res.meta.output.payload }}"
+      when: "item.status | default('n/a') == 'Expired'"
+
+    - debug:
+        msg: "{{ item.mkey }}"
+      with_items: "{{ expired_cert_list }}"
+
+
+    - include_tasks: tasks/delete_cert.yml
+      with_items: "{{ expired_cert_list }}"
+      vars:
+        cert_name: "{{ item.mkey }}"
+      when: "name_filter | default(item.mkey) == item.mkey"
